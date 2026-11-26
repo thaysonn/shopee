@@ -1,0 +1,53 @@
+name: Build and test
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+        working-directory: frontend
+      - run: npm run build
+        working-directory: frontend
+      - run: npm test
+        working-directory: frontend
+      - run: node --test scripts/dependabot-issues.test.cjs
+      - uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4
+        with:
+          global-json-file: global.json
+      - run: npx playwright install --with-deps chromium
+        working-directory: frontend
+      - run: npm run test:e2e
+        working-directory: frontend
+      - name: Report npm vulnerabilities (expected in this lab)
+        run: node scripts/audit-npm.cjs
+
+  backend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4
+        with:
+          global-json-file: global.json
+      - run: dotnet restore backend/DemoShop.slnx
+      - run: dotnet build backend/DemoShop.slnx --no-restore --configuration Release
+      - run: dotnet test backend/DemoShop.slnx --no-build --configuration Release
+      - name: Report NuGet vulnerabilities (expected in this lab)
+        run: dotnet list backend/DemoShop.slnx package --vulnerable --include-transitive

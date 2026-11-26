@@ -1,0 +1,8 @@
+[
+  { "id": 1, "name": "Fone Aurora", "category": "Áudio", "price": 189.90, "description": "Sua trilha sonora, com conforto o dia todo." },
+  { "id": 2, "name": "Teclado Nuvem", "category": "Mesa", "price": 249.90, "description": "Compacto, leve e pronto para novas ideias." },
+  { "id": 3, "name": "Luminária Solar", "category": "Casa", "price": 129.90, "description": "Um toque de luz para o seu cantinho." },
+  { "id": 4, "name": "Garrafa Horizonte", "category": "Lifestyle", "price": 79.90, "description": "Uma boa companhia em todas as jornadas." },
+  { "id": 5, "name": "Mouse Órbita", "category": "Mesa", "price": 99.90, "description": "Precisão e simplicidade na medida certa." },
+  { "id": 6, "name": "Caixa de som Brisa", "category": "Áudio", "price": 159.90, "description": "Pequena no tamanho, grande nas boas vibrações." }
+]

@@ -1,0 +1,85 @@
+name: Dependabot PR issues
+
+on:
+  pull_request_target:
+    types: [opened, reopened, closed]
+
+permissions: {}
+
+concurrency:
+  group: dependabot-issue-${{ github.event.pull_request.number }}
+  cancel-in-progress: false
+
+jobs:
+  track:
+    if: >-
+      github.event.pull_request.user.login == 'dependabot[bot]' &&
+      github.event.pull_request.user.type == 'Bot' &&
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      github.event.pull_request.base.ref == github.event.repository.default_branch
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: read
+    steps:
+      # Metadata only. Never check out or execute code from the PR here.
+      - uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const number = context.payload.pull_request.number;
+            const { data: pr } = await github.rest.pulls.get({
+              owner, repo, pull_number: number,
+            });
+            if (pr.user.login !== 'dependabot[bot]' || pr.user.type !== 'Bot' ||
+                pr.head.repo?.full_name !== `${owner}/${repo}` ||
+                pr.base.ref !== context.payload.repository.default_branch) {
+              return;
+            }
+
+            // Read the latest PR state, so delayed events cannot undo a merge.
+            const marker = `<!-- dependabot-pr:${number} -->`;
+            const url = `${context.serverUrl}/${owner}/${repo}/pull/${number}`;
+            const merged = pr.merged === true;
+            const status = merged
+              ? 'PR integrado. Confirme a resolucao do alerta no GitHub.'
+              : pr.state === 'closed'
+                ? 'PR fechado sem merge. Correcao ainda pendente; revise o alerta.'
+                : 'PR aberto. Revise o diff, os alertas associados e os testes antes do merge.';
+            const body = [
+              marker,
+              '## Atualizacao de dependencias',
+              '',
+              `PR do Dependabot: ${url}`,
+              '',
+              status,
+              '',
+              'Esta issue foi criada por GitHub Actions, nao nativamente pelo Dependabot.',
+              'Uma atualizacao pode resolver um ou mais alertas. Consulte o PR e a aba Security.',
+              'Fechar um PR sem merge nao comprova a correcao de uma vulnerabilidade.',
+            ].join('\n');
+            const issues = await github.paginate(github.rest.issues.listForRepo, {
+              owner, repo, state: 'all', creator: 'github-actions[bot]', per_page: 100,
+            });
+            const existing = issues.find(issue =>
+              !issue.pull_request && issue.user?.login === 'github-actions[bot]' &&
+              issue.body?.startsWith(`${marker}\n`));
+            const state = merged ? 'closed' : 'open';
+            if (existing) {
+              if (existing.body !== body || existing.state !== state) {
+                await github.rest.issues.update({
+                  owner, repo, issue_number: existing.number, body, state,
+                  ...(merged ? { state_reason: 'completed' } : {}),
+                });
+              }
+            } else {
+              const { data: created } = await github.rest.issues.create({
+                owner, repo, title: `Acompanhar atualizacao do Dependabot #${number}`, body,
+              });
+              if (merged) {
+                await github.rest.issues.update({
+                  owner, repo, issue_number: created.number, state: 'closed',
+                  state_reason: 'completed',
+                });
+              }
+            }

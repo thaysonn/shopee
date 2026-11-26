@@ -1,0 +1,16 @@
+**/node_modules/
+**/dist/
+**/.angular/
+**/bin/
+**/obj/
+**/TestResults/
+**/coverage/
+**/test-results/
+**/playwright-report/
+.vs/
+.env
+.env.*
+!.env.example
+*.user
+*.log
+artifacts/

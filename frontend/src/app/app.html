@@ -1,0 +1,258 @@
+<div class="lab-banner">
+  <span class="status-dot"></span> AMBIENTE DE DEMONSTRAÇÃO
+  <span class="banner-detail">Dados fictícios. Nenhum pagamento real.</span>
+</div>
+<header class="header">
+  <a class="brand" href="/" aria-label="Vitrine, início">
+    <span class="brand-icon" aria-hidden="true">v.</span> vitrine<span class="brand-dot">.</span>
+  </a>
+  <span class="header-note">Pequena loja. Grandes aprendizados.</span>
+  <a class="cart-link" href="#carrinho"
+    >Sua sacola <span>{{ shop.count() }}</span></a
+  >
+</header>
+<main>
+  <section class="hero">
+    <div>
+      <span class="eyebrow">CURADORIA PARA O SEU DIA A DIA</span>
+      <h1>Boas escolhas,<br />em cada detalhe<span>.</span></h1>
+      <p>
+        Um pouco de tecnologia, um toque de conforto.<br />Encontre seu próximo favorito por aqui.
+      </p>
+      <a href="#catalogo" class="hero-link"
+        >Explore a coleção <span aria-hidden="true">&rarr;</span></a
+      >
+    </div>
+    <div class="hero-art" aria-hidden="true">
+      <div class="orbit orbit-one"></div>
+      <div class="orbit orbit-two"></div>
+      <div class="hero-card"><span>v.</span><small>feito para o seu dia</small></div>
+      <span class="floating-label">SIMPLICIDADE + DESIGN</span>
+    </div>
+  </section>
+  <div class="shop-layout">
+    <section id="catalogo" aria-labelledby="catalog-title">
+      <div class="section-heading">
+        <div>
+          <span class="eyebrow">ESCOLHIDOS A DEDO</span>
+          <h2 id="catalog-title">Nossa coleção</h2>
+        </div>
+        <span class="muted">{{ visibleProducts().length }} produtos</span>
+      </div>
+      <div class="filters" aria-label="Filtrar por categoria">
+        @for (item of categories(); track item) {
+          <button
+            type="button"
+            [class.active]="category() === item"
+            [attr.aria-pressed]="category() === item"
+            (click)="category.set(item)"
+          >
+            {{ item }}
+          </button>
+        }
+      </div>
+      @if (shop.loading()) {
+        <p class="notice" role="status">Preparando a vitrine...</p>
+      } @else if (shop.catalogError()) {
+        <div class="notice error" role="alert">
+          <p>{{ shop.catalogError() }}</p>
+          <button type="button" (click)="shop.loadProducts()">Tentar novamente</button>
+        </div>
+      } @else {
+        <div class="products">
+          @for (product of visibleProducts(); track product.id) {
+            <article class="product">
+              <div class="product-art" [attr.data-product]="product.id">
+                <span class="product-tag">{{ product.category }}</span>
+                <svg viewBox="0 0 160 140" fill="none" aria-hidden="true">
+                  @switch (product.id) {
+                    @case (1) {
+                      <path
+                        d="M40 83V66a40 40 0 0 1 80 0v17"
+                        stroke="currentColor"
+                        stroke-width="13"
+                      />
+                      <rect x="27" y="69" width="28" height="47" rx="12" fill="currentColor" />
+                      <rect x="105" y="69" width="28" height="47" rx="12" fill="currentColor" />
+                    }
+                    @case (2) {
+                      <rect x="13" y="37" width="134" height="73" rx="12" fill="currentColor" />
+                      <path
+                        d="M26 54h108M26 70h108M26 86h108M46 99h68"
+                        stroke="white"
+                        stroke-width="5"
+                        stroke-linecap="round"
+                        stroke-dasharray="7 9"
+                      />
+                    }
+                    @case (3) {
+                      <path d="M51 54 91 22l30 42-64 24Z" fill="currentColor" />
+                      <path
+                        d="m84 63-26 45h48"
+                        stroke="currentColor"
+                        stroke-width="9"
+                        stroke-linecap="round"
+                      />
+                      <ellipse cx="81" cy="116" rx="40" ry="8" fill="currentColor" />
+                    }
+                    @case (4) {
+                      <rect x="61" y="14" width="38" height="15" rx="5" fill="currentColor" />
+                      <rect x="51" y="32" width="58" height="96" rx="20" fill="currentColor" />
+                      <path
+                        d="M63 52v49"
+                        stroke="white"
+                        stroke-opacity=".4"
+                        stroke-width="5"
+                        stroke-linecap="round"
+                      />
+                    }
+                    @case (5) {
+                      <rect x="44" y="15" width="72" height="111" rx="36" fill="currentColor" />
+                      <path d="M80 16v37" stroke="white" stroke-opacity=".5" stroke-width="3" />
+                      <rect x="76" y="38" width="8" height="18" rx="4" fill="white" />
+                    }
+                    @default {
+                      <rect x="28" y="31" width="104" height="85" rx="20" fill="currentColor" />
+                      <circle
+                        cx="80"
+                        cy="74"
+                        r="27"
+                        stroke="white"
+                        stroke-opacity=".5"
+                        stroke-width="4"
+                      />
+                      <circle cx="80" cy="74" r="15" fill="white" fill-opacity=".25" />
+                      <path d="M51 31v-7h58v7" stroke="currentColor" stroke-width="6" />
+                    }
+                  }
+                </svg>
+              </div>
+              <div class="product-info">
+                <h3>{{ product.name }}</h3>
+                <p>{{ product.description }}</p>
+                <div class="product-bottom">
+                  <strong>{{ money(product.price) }}</strong>
+                  <button
+                    type="button"
+                    class="add-button"
+                    (click)="shop.add(product)"
+                    [disabled]="shop.submitting() || shop.quantity(product.id) >= 99"
+                    [attr.aria-label]="'Adicionar ' + product.name"
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+            </article>
+          } @empty {
+            <p class="notice">Nenhum produto disponível nesta categoria.</p>
+          }
+        </div>
+      }
+    </section>
+    <aside id="carrinho" class="cart" aria-labelledby="cart-title">
+      <div class="cart-heading">
+        <h2 id="cart-title">Sua sacola</h2>
+        <span class="count">{{ shop.count() }}</span>
+      </div>
+      @if (shop.order(); as order) {
+        <div class="success" role="status">
+          <strong>Pedido confirmado!</strong>
+          <p>Compra simulada de {{ money(order.total) }}.</p>
+          <small>Pedido {{ order.id }}</small>
+          <p>Nenhum valor foi cobrado.</p>
+        </div>
+      }
+      @if (shop.cart().length === 0) {
+        <div class="empty-cart">
+          <span aria-hidden="true" class="bag-icon"></span>
+          <h3>Espaço para boas escolhas</h3>
+          <p>Adicione seus favoritos e eles<br />aparecerão aqui.</p>
+        </div>
+      } @else {
+        <ul class="cart-items">
+          @for (item of shop.cart(); track item.product.id) {
+            <li>
+              <div class="cart-item-title">
+                <strong>{{ item.product.name }}</strong
+                ><button
+                  type="button"
+                  class="remove"
+                  (click)="shop.remove(item.product.id)"
+                  [disabled]="shop.submitting()"
+                  [attr.aria-label]="'Remover ' + item.product.name"
+                >
+                  &times;
+                </button>
+              </div>
+              <div class="cart-item-bottom">
+                <div class="quantity">
+                  <button
+                    type="button"
+                    (click)="shop.setQuantity(item.product, item.quantity - 1)"
+                    [disabled]="shop.submitting() || item.quantity <= 1"
+                    [attr.aria-label]="'Diminuir quantidade de ' + item.product.name"
+                  >
+                    &minus;
+                  </button>
+                  <span [attr.aria-label]="'Quantidade de ' + item.product.name">{{
+                    item.quantity
+                  }}</span>
+                  <button
+                    type="button"
+                    (click)="shop.add(item.product)"
+                    [disabled]="shop.submitting() || item.quantity >= 99"
+                    [attr.aria-label]="'Aumentar quantidade de ' + item.product.name"
+                  >
+                    +
+                  </button>
+                </div>
+                <span>{{
+                  money((Math.round(item.product.price * 100) * item.quantity) / 100)
+                }}</span>
+              </div>
+            </li>
+          }
+        </ul>
+      }
+      @if (shop.cartError()) {
+        <p class="notice error" role="alert">{{ shop.cartError() }}</p>
+      }
+      <div class="summary">
+        <div>
+          <span>Subtotal</span><span>{{ money(shop.total()) }}</span>
+        </div>
+        <div><span>Entrega</span><span>Simulada</span></div>
+        <div class="total">
+          <strong>Total</strong><strong>{{ money(shop.total()) }}</strong>
+        </div>
+      </div>
+      <button
+        type="button"
+        class="checkout"
+        (click)="shop.checkout()"
+        [disabled]="shop.submitting() || !shop.cart().length"
+      >
+        {{ shop.submitting() ? 'Confirmando...' : 'Finalizar compra' }}
+        <span aria-hidden="true">&rarr;</span>
+      </button>
+      <p class="checkout-note">Checkout de demonstração. Sem pagamento.</p>
+    </aside>
+  </div>
+  <section class="lab-info">
+    <span class="lab-badge" aria-hidden="true">&lt;/&gt;</span>
+    <div>
+      <h2>Por trás desta vitrine: dependências mais seguras.</h2>
+      <p>
+        Este laboratório demonstra alertas e PRs do Dependabot para npm e NuGet. A criação de issues
+        é uma automação adicional do GitHub Actions.
+      </p>
+    </div>
+    <span class="lab-stack">Angular + .NET</span>
+  </section>
+</main>
+<footer>
+  <span class="footer-brand">vitrine.</span
+  ><span>Projeto fictício &middot; Laboratório de segurança de dependências</span
+  ><span>Somente uso local</span>
+</footer>
