@@ -158,6 +158,22 @@ Depois da apresentacao e dos merges, pode-se voltar ao limite `0` nos dois
 ecossistemas para desativar apenas os PRs de versao. Essa reversao nao e
 automatica; mantenha os alertas e security updates ativos.
 
+### Resultado real da alternativa
+
+Os dois jobs de version updates terminaram com sucesso e o proprio
+`dependabot[bot]` abriu os PRs abaixo. O workflow `Dependabot PR issues`
+criou as issues como `github-actions[bot]`.
+
+| Pacote | PR do Dependabot | Issue automatica |
+| --- | --- | --- |
+| Lodash 4.17.20 -> 4.18.1 | [PR #1](https://github.com/thaysonn/shopee/pull/1) | [Issue #2](https://github.com/thaysonn/shopee/issues/2) |
+| Newtonsoft.Json 12.0.3 -> 13.0.4 | [PR #3](https://github.com/thaysonn/shopee/pull/3) | [Issue #4](https://github.com/thaysonn/shopee/issues/4) |
+
+Os workflows de build/testes dos dois PRs e os dois workflows de criacao das
+issues passaram no GitHub. Nenhum merge foi feito na verificacao: os PRs e
+issues foram deixados abertos para a apresentacao. O fechamento das issues
+e a resolucao dos alertas devem ser conferidos apos os merges.
+
 Antes da reuniao, confirme que os alertas e PRs reais ja apareceram. A
 preparacao local nao pode comprovar o processamento remoto do GitHub.
 
@@ -255,8 +271,10 @@ Newtonsoft.Json 12.0.3 no projeto da API.
 **Verificado remotamente:** a CI executou com sucesso no GitHub, o Dependency
 graph reconheceu Lodash 4.17.20 e Newtonsoft.Json 12.0.3, e os alertas foram
 criados. Alerts e security updates estao ativos, com agrupamento desativado.
+Pela alternativa de version updates, o Dependabot criou os PRs #1 e #3,
+a automacao criou as issues #2 e #4, e a CI de ambos os PRs passou.
 
-**Ainda a verificar:** criacao real dos PRs/issues e fechamento apos merge.
+**Ainda a verificar:** fechamento das issues e resolucao dos alertas apos merge.
 O processamento de security updates permaneceu pendente na tentativa inicial.
 
 ### Restricoes
