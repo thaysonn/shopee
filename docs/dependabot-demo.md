@@ -68,7 +68,9 @@ ao reiniciar a API e a sacola some ao recarregar a pagina.
 
 ## 4. Publicar no GitHub
 
-Esta etapa e manual e nao foi executada durante a preparacao.
+O repositorio desta POC ja foi publicado em
+[thaysonn/shopee](https://github.com/thaysonn/shopee). As instrucoes abaixo
+servem para reproduzir a demonstracao em outro repositorio.
 
 Crie um repositorio **vazio**, de demonstracao, na sua conta/organizacao, sem
 README inicial. Repositorio privado e suficiente, sujeito as politicas da
@@ -106,6 +108,7 @@ No repositorio, com permissao administrativa:
 2. Habilite **Dependency graph**.
 3. Habilite **Dependabot alerts**.
 4. Habilite **Dependabot security updates**.
+   Para manter os exemplos separados, deixe **Grouped security updates** desativado.
 5. Confirme que **Actions** e **Issues** estao habilitados.
 6. Em **Actions > General**, confirme que as actions referenciadas e as
    permissoes declaradas nos workflows sao permitidas pela organizacao.
@@ -117,9 +120,43 @@ O YAML concede leitura de conteudo para CI; o workflow de issues concede
 Os arquivos devem estar na **branch padrao**. O Dependabot analisa os
 manifestos npm em `/frontend` e os projetos NuGet em `/backend`.
 
-`open-pull-requests-limit: 0` desativa PRs rotineiros de **versao**; nao desativa
-PRs de **seguranca**. O agendamento semanal obrigatorio do formato nao e uma
-promessa de quando um alerta ou PR de seguranca sera criado.
+O YAML atual usa `open-pull-requests-limit: 1` por ecossistema e `allow` apenas
+para `lodash` e `Newtonsoft.Json`. Assim, permite um PR de **versao** aberto por
+ecossistema para esses pacotes, sem propor atualizacoes rotineiras de todo o
+Angular ou dos pacotes de teste. Os demais alertas continuam visiveis.
+O limite e o agendamento semanal se referem a atualizacoes de versao, nao
+determinam o prazo de processamento dos alertas ou PRs de seguranca.
+
+### Alternativa para a fila de seguranca pendente
+
+Na configuracao inicial, o limite era `0`: isso e valido para usar somente
+security updates e nao foi identificado como causa do bloqueio.
+O GitHub detectou os pacotes e gerou os alertas, mas permaneceu em
+**Creating a security update**, sem PR e sem erro informado, mesmo apos
+desativar o agrupamento e reativar security updates uma vez.
+
+Com autorizacao do usuario, foram habilitados version updates somente para os
+dois pacotes. O objetivo e solicitar um job do Dependabot que possa ser
+acompanhado, sem atualizar dependencias manualmente ou criar um PR falso.
+
+1. Publique esta configuracao na branch padrao.
+2. Abra **Insights > Dependency graph > Dependabot**.
+3. Localize npm/frontend ou NuGet/backend e abra **Recent update jobs**.
+4. Se ainda nao existir uma execucao em andamento, use **Check for updates**
+   quando essa opcao estiver disponivel. O commit da configuracao tambem pode
+   disparar a verificacao inicial.
+5. Abra **View logs** e confira o resultado.
+6. Se o bot abrir um PR, verifique o autor, o tipo da atualizacao e a versao
+   resolvida. O workflow de issues funciona para PRs de versao e de seguranca.
+
+**Como apresentar:** "O Dependabot detectou as vulnerabilidades. Solicitamos
+tambem uma atualizacao direcionada de versao pelo proprio Dependabot, que
+pode resolver esses alertas." Nao afirme que a fila original de security
+updates foi corrigida sem evidencia. Nao ha garantia de criacao imediata de PR.
+
+Depois da apresentacao e dos merges, pode-se voltar ao limite `0` nos dois
+ecossistemas para desativar apenas os PRs de versao. Essa reversao nao e
+automatica; mantenha os alertas e security updates ativos.
 
 Antes da reuniao, confirme que os alertas e PRs reais ja apareceram. A
 preparacao local nao pode comprovar o processamento remoto do GitHub.
@@ -179,7 +216,8 @@ executam o mesmo script embutido no YAML com API mockada.
 | E2E reclama de porta em uso | Pare os servidores iniciados manualmente; o teste inicia seus proprios processos. |
 | Alerta nao aparece | Branch padrao, manifestos/lockfile publicados, dependency graph e alerts ativos, politicas da organizacao. |
 | Alerta existe mas nao ha PR | Security updates ativo, erro indicado no alerta, resolucao de versoes e logs do Dependabot. |
-| Nenhum PR de versao aparece | E intencional: `open-pull-requests-limit: 0`. |
+| Nenhum PR de versao aparece | Confira os jobs em Insights > Dependency graph > Dependabot, os pacotes permitidos e se ja existe um PR aberto no ecossistema. O limite atual e 1. |
+| Alerta fica em Creating a security update | Nao execute a CI repetidamente. Confira erros no alerta e jobs do bot; a alternativa de versao direcionada acima nao comprova que a fila de seguranca foi destravada. |
 | Issue nao aparece | Autor do PR, branch base padrao, Actions/Issues habilitados e log de `Dependabot PR issues`. O workflow precisa existir antes do evento. |
 | Workflow retorna 403 | Permissoes do GITHUB_TOKEN e restricoes da organizacao; nao adicione PAT como atalho. |
 | PR foi aberto antes do workflow existir | Feche e reabra o PR apropriado, se permitido, ou use a opcao de reexecucao quando houver uma execucao existente. |
@@ -214,10 +252,12 @@ As correcoes foram aplicadas apenas em copia temporaria isolada
 O projeto entregue preserva Lodash 4.17.20 no manifesto e no lockfile e
 Newtonsoft.Json 12.0.3 no projeto da API.
 
-**Nao verificado remotamente:** execucao do GitHub Actions nos runners do
-GitHub, descoberta dos manifestos pelo servico, criacao de alertas/PRs/issues
-e fechamento real apos merge. Esses pontos dependem da publicacao e da
-ativacao dos recursos descritos neste roteiro.
+**Verificado remotamente:** a CI executou com sucesso no GitHub, o Dependency
+graph reconheceu Lodash 4.17.20 e Newtonsoft.Json 12.0.3, e os alertas foram
+criados. Alerts e security updates estao ativos, com agrupamento desativado.
+
+**Ainda a verificar:** criacao real dos PRs/issues e fechamento apos merge.
+O processamento de security updates permaneceu pendente na tentativa inicial.
 
 ### Restricoes
 

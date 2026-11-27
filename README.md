@@ -16,7 +16,8 @@ testes -> merge manual -> resolucao do alerta.**
 - Interface responsiva em portugues; valores em reais.
 - API que valida IDs e quantidades inteiras de 1 a 99 e calcula o total.
 - Carrinho no navegador e pedidos na memoria da API; nada persiste ao reiniciar.
-- Configuracao de Dependabot para npm e NuGet, somente PRs de seguranca.
+- Dependabot para npm e NuGet, com atualizacoes de versao direcionadas somente
+  a Lodash e Newtonsoft.Json, alem dos recursos de seguranca habilitados no GitHub.
 - CI com build, testes e auditorias visiveis.
 - Automacao idempotente de uma issue por PR do Dependabot.
 
@@ -123,10 +124,17 @@ com o Node definido neste laboratorio.
 
 ## Publicar e apresentar
 
-Siga o [roteiro de demonstracao](docs/dependabot-demo.md) para criar seu
-repositorio, publicar a baseline, ativar os recursos de seguranca e acompanhar
-o fluxo. Nenhum repositorio remoto, commit, push, alerta ou PR real foi criado
-automaticamente durante a preparacao local.
+O projeto esta publicado em [thaysonn/shopee](https://github.com/thaysonn/shopee).
+Siga o [roteiro de demonstracao](docs/dependabot-demo.md) para executar e
+apresentar a POC, ou reproduzi-la em outro repositorio.
+
+A fila de security updates permaneceu pendente mesmo com os recursos ativos.
+Como alternativa autorizada para a demonstracao, o YAML tambem permite
+**1 PR de versao por ecossistema**, restrito aos dois pacotes do laboratorio.
+Use **Insights > Dependency graph > Dependabot > Recent update jobs** para
+acompanhar a execucao e **Check for updates**, quando disponivel, para solicita-la.
+Essa alternativa nao comprova que a fila original de security updates foi
+destravada: um PR de versao tambem pode corrigir vulnerabilidades.
 
 O arquivo [.github/dependabot.yml](.github/dependabot.yml) **nao habilita sozinho**
 Dependency graph, Dependabot alerts ou Dependabot security updates. Esses

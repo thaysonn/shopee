@@ -4,10 +4,14 @@ updates:
     directory: /frontend
     schedule:
       interval: weekly
-    # Disable version-update PRs, not security-update PRs.
-    open-pull-requests-limit: 0
+    # Also allow a version-update job for the lab package while security updates are pending.
+    open-pull-requests-limit: 1
+    allow:
+      - dependency-name: lodash
   - package-ecosystem: nuget
     directory: /backend
     schedule:
       interval: weekly
-    open-pull-requests-limit: 0
+    open-pull-requests-limit: 1
+    allow:
+      - dependency-name: Newtonsoft.Json
